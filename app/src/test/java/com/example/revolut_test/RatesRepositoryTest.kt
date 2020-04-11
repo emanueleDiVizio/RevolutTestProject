@@ -1,7 +1,6 @@
 package com.example.revolut_test
 
 import com.example.revolut_test.data.model.Rates
-import com.example.revolut_test.data.model.RatesModel
 import com.example.revolut_test.data.network.RatesApi
 import com.example.revolut_test.data.repository.RatesRepository
 import com.nhaarman.mockitokotlin2.doReturn
@@ -14,9 +13,9 @@ import java.util.concurrent.TimeUnit
 
 
 class RatesRepositoryTest {
-    val usdRates = RatesModel("USD", Rates())
-    val usdRates2 = RatesModel("USD_2", Rates())
-    val usdRates3 = RatesModel("USD_3", Rates())
+    val usdRates = Rates("USD", HashMap())
+    val usdRates2 = Rates("USD_2", HashMap())
+    val usdRates3 = Rates("USD_3", HashMap())
 
     val testScheduler = TestScheduler()
 
