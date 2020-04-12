@@ -1,6 +1,5 @@
 package com.example.revolut_test.injection.module
 
-import com.example.revolut_test.data.network.RatesApi
 import com.example.revolut_test.utils.BASE_URL
 import dagger.Module
 import dagger.Provides

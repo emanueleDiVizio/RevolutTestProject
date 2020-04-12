@@ -1,11 +1,10 @@
 package com.example.revolut_test.ui
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
+import android.util.Log.d
 import com.example.revolut_test.base.BaseViewModel
-import com.example.revolut_test.data.model.Currency
-import com.example.revolut_test.data.model.Rates
-import com.example.revolut_test.data.repository.RatesRepository
+import com.example.revolut_test.data.model.CurrencyEntry
+import com.example.revolut_test.data.model.RatesBook
+import com.example.revolut_test.data.repository.RatesBookRepository
 import com.example.revolut_test.utils.DEFAULT_CURRENCY
 import com.example.revolut_test.utils.DEFAULT_RATES_UPDATE_RATE
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -14,29 +13,24 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
-class RatesViewModel @Inject constructor(val ratesRepository: RatesRepository): BaseViewModel() {
-
+class RatesViewModel @Inject constructor(private val ratesBookRepository: RatesBookRepository, val currencyAdapter: CurrencyAdapter): BaseViewModel() {
+    private var onClickListener: () -> Unit = {}
 
     private lateinit var subscription: Disposable
-
     private val currencySubject: BehaviorSubject<String> = BehaviorSubject.createDefault(DEFAULT_CURRENCY)
-    private var ratesLiveData: MutableLiveData<Rates> = MutableLiveData()
-
-
-    val currencyAdapter: CurrencyAdapter = CurrencyAdapter(ratesLiveData, MutableLiveData())
 
 
     init{
-        currencyAdapter.setOnItemSelectedListener{ currency -> updateCurrency(currency) }
+        currencyAdapter.setOnItemSelectedListener{ currency -> onItemClick(currency)  }
     }
 
-    private fun updateCurrency(currency: Currency){
-        currencySubject.onNext(currency.code)
+    private fun updateCurrency(currencyEntry: CurrencyEntry){
+        currencySubject.onNext(currencyEntry.code)
     }
 
     fun subscribeToRates() {
         subscription =
-            currencySubject.flatMap { currency: String -> ratesRepository.observeRates(currency, DEFAULT_RATES_UPDATE_RATE) }
+            currencySubject.switchMap { currency: String -> ratesBookRepository.observeRates(currency, DEFAULT_RATES_UPDATE_RATE) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -47,14 +41,22 @@ class RatesViewModel @Inject constructor(val ratesRepository: RatesRepository): 
 
     }
 
+    fun setOnItemClickListener(listener: () -> Unit){
+        onClickListener = listener
+    }
 
-    private fun onRetrieveRatesSuccess(rates: Rates) {
-        ratesLiveData.value = rates
-        currencyAdapter.updateRates(buildCurrencyListFromRates(rates)) // Could be done only once
+    private fun onItemClick(currencyEntry: CurrencyEntry){
+        updateCurrency(currencyEntry)
+        onClickListener.invoke()
+    }
+
+
+    private fun onRetrieveRatesSuccess(ratesBook: RatesBook) {
+        currencyAdapter.updateRates(ratesBook)
     }
 
     private fun onRetrieveRatesError(error: Throwable) {
-        Log.d("H", error.toString())
+        // Do something with error.
 
     }
 
@@ -63,10 +65,7 @@ class RatesViewModel @Inject constructor(val ratesRepository: RatesRepository): 
         subscription.dispose()
     }
 
-    private fun buildCurrencyListFromRates(rates: Rates): List<Currency>{
-        val mutableList = mutableListOf<Currency>()
-        mutableList.add(Currency(rates.baseCurrency))
-        rates.rates.keys.forEach { code -> mutableList.add(Currency(code)) }
-        return mutableList
-    }
+
+
+
 }

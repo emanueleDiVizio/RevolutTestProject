@@ -1,7 +1,7 @@
 package com.example.revolut_test.injection.module
 
-import com.example.revolut_test.data.network.RatesApi
-import com.example.revolut_test.data.repository.RatesRepository
+import com.example.revolut_test.data.network.RatesBookApi
+import com.example.revolut_test.data.repository.RatesBookRepository
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -22,19 +22,19 @@ object RatesModule {
     @Provides
     @Reusable
     @JvmStatic
-    internal fun providePostApi(retrofit: Retrofit): RatesApi {
-        return retrofit.create(RatesApi::class.java)
+    internal fun providePostApi(retrofit: Retrofit): RatesBookApi {
+        return retrofit.create(RatesBookApi::class.java)
     }
 
     /**
-     * Provides the Rates repository.
-     * @param ratesApi the API interface.
-     * @return the RatesRepository.
+     * Provides the RatesBook repository.
+     * @param ratesBookApi the API interface.
+     * @return the RatesBookRepository.
      */
     @Provides
     @Reusable
     @JvmStatic
-    internal fun provideRatesRepository(ratesApi: RatesApi): RatesRepository {
-        return RatesRepository(ratesApi, Schedulers.io())
+    internal fun provideRatesBookRepository(ratesBookApi: RatesBookApi): RatesBookRepository {
+        return RatesBookRepository(ratesBookApi, Schedulers.io())
     }
 }

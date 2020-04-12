@@ -3,6 +3,7 @@ package com.example.revolut_test
 import android.app.Activity
 import android.app.Application
 import com.example.revolut_test.injection.component.DaggerApplicationComponent
+import com.example.revolut_test.utils.CurrencyHelper
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
@@ -19,6 +20,7 @@ class App : Application(), HasActivityInjector {
 
     override fun onCreate() {
         super.onCreate()
+        CurrencyHelper.setUp(this)
         DaggerApplicationComponent.builder()
             .applicationBind(this)
             .build()

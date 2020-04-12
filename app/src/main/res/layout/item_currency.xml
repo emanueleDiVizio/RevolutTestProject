@@ -20,23 +20,25 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:textStyle="bold"
-            android:text="@{viewModel.currencyName}"
+            android:text="@{viewModel.currencyCode}"
             app:layout_constraintEnd_toStartOf="@+id/editText"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/post_body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@{viewModel.currencyCode}"
+            android:layout_marginBottom="16dp"
+            android:text="@{viewModel.currencyName}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/editText"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -44,14 +46,13 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:adjustViewBounds="true"
+            android:src="@{viewModel.currencyFlag}"
+            app:layout_constraintBottom_toBottomOf="@+id/post_body"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:layout_constraintTop_toTopOf="@+id/post_title" />
 
         <EditText
             android:id="@+id/editText"
@@ -60,11 +61,13 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
-            android:text="@{viewModel.convertedRate}"
-
-            app:textChangedListener="@{viewModel.inputTextWatcher}"
-            android:inputType="textPersonName"
+            android:text="@{viewModel.currencyValue}"
+            android:inputType="numberDecimal"
+            app:layout_constraintBottom_toBottomOf="@+id/post_body"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/post_title" />
+            app:layout_constraintTop_toTopOf="@+id/post_title"
+            app:onClickListener="@{viewModel.onFocusChanged}"
+            app:shouldPreventFocus="@{!viewModel.isBase}"
+            app:textChangedListener="@{viewModel.inputTextWatcher}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

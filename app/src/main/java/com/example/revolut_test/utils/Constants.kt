@@ -6,3 +6,4 @@ const val BASE_URL: String = "https://hiring.revolut.codes/"
 
 const val DEFAULT_RATES_UPDATE_RATE: Long = 1
 const val DEFAULT_CURRENCY: String = "EUR"
+const val DEFAULT_BASE_VALUE: String = "1.00"

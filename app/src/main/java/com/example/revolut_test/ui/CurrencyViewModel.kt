@@ -2,31 +2,40 @@ package com.example.revolut_test.ui
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log.d
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations.map
 import com.example.revolut_test.base.BaseViewModel
-import com.example.revolut_test.data.model.Currency
-import com.example.revolut_test.data.model.Rates
-import com.example.revolut_test.utils.getDisplayNameFromCountry
+import com.example.revolut_test.data.model.CurrencyEntry
+import com.example.revolut_test.utils.CurrencyHelper.getDisplayNameFromCurrencyCode
+import com.example.revolut_test.utils.CurrencyHelper.getFlagFromCurrencyCode
 
 
-class CurrencyViewModel: BaseViewModel() {
+class CurrencyViewModel : BaseViewModel() {
+    var onUserInputListener: (String) -> Unit = {}
+    var onUserFocusListener: () -> Unit = {}
     val currencyCode = MutableLiveData<String>()
     val currencyName = MutableLiveData<String>()
-    val currencyLiveData = MutableLiveData<Currency>()
-    private lateinit var ratesLiveData: MutableLiveData<Rates>
-    private lateinit var userInputLiveData: MutableLiveData<String>
+    var currencyValue = MutableLiveData<String>()
+    var currencyFlag = MutableLiveData<String>()
+    var isBase = MutableLiveData<Boolean>()
 
-    fun bind(currency: Currency, ratesLiveData: MutableLiveData<Rates>, userInputLiveData: MutableLiveData<String>){
-        this.ratesLiveData = ratesLiveData
-        this.userInputLiveData = userInputLiveData
-        currencyLiveData.value = currency
-        currencyCode.value = currency.code
-        currencyName.value = getDisplayNameFromCountry(currency.code)
+    fun bind(
+        currencyEntry: CurrencyEntry
+    ) {
+
+        if(currencyCode.value != currencyEntry.code){
+            isBase.value = currencyEntry.isBase
+            currencyCode.value = currencyEntry.code
+            currencyName.value = getDisplayNameFromCurrencyCode(currencyEntry.code)
+            currencyFlag.value = getFlagFromCurrencyCode(currencyEntry.code)
+        }
+        currencyValue.value = currencyEntry.value
+
     }
 
+    fun getOnFocusChanged(): () -> Unit {
+        return {
+            onUserFocusListener.invoke() }
+    }
 
 
     fun getInputTextWatcher(): TextWatcher? {
@@ -46,7 +55,9 @@ class CurrencyViewModel: BaseViewModel() {
                 before: Int,
                 count: Int
             ) {
-                setUserInput(s.toString())
+                if(isBase.value ==  true){
+                    setUserInput(s.toString())
+                }
             }
 
             override fun afterTextChanged(s: Editable) {
@@ -55,19 +66,9 @@ class CurrencyViewModel: BaseViewModel() {
         }
     }
 
-    fun getConvertedRate(): LiveData<String> {
-        return map(userInputLiveData) { input -> input}
-
-//        return map(userInputLiveData) {input ->
-//            d("RATE", ratesLiveData.value.toString())
-//            val rate: Long? = ratesLiveData.value?.rates?.get(currencyLiveData.value?.code)?.toLong()
-//            d("NEW_RATE", rate.toString())
-//            rate?.times(input.toLong()).toString()
-//        }
+    private fun setUserInput(input: String = "") {
+        if ("" != input) onUserInputListener.invoke(input);
     }
 
-    fun setUserInput(input: String?){
-        d("INPUT", input)
-        userInputLiveData.value = input
-    }
+
 }
